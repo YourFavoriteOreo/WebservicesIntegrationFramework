@@ -8,6 +8,20 @@
     <artifactId>jmaqs-webservice-intergration-framework</artifactId>
     <version>1.0-SNAPSHOT</version>
 
+    <repositories>
+    <repository>
+            <id>JMAQS_SnapShot</id>
+            <url>https://pkgs.dev.azure.com/MagenicOpen/JMAQS/_packaging/JMAQS_SnapShot/maven/v1
+            </url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+             </repositories>
+         
     <dependencies>
         <dependency>
             <groupId>com.magenic.jmaqs.webservices</groupId>
