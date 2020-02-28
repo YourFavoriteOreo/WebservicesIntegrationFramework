@@ -1,15 +1,9 @@
 package com.magenic.jmaqs.webservices.integration;
 
-import com.magenic.jmaqs.webservices.BaseWebServiceTest;
-import com.magenic.jmaqs.webservices.*;
+import com.magenic.jmaqs.webservices.jdk8.WebServiceDriver;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.entity.ContentType;
-import org.apache.http.impl.client.CloseableHttpClient;
-import sun.awt.windows.WEmbeddedFrame;
-
-import javax.swing.text.StringContent;
-import java.net.*;
 
 public class EmployeeController {
 
@@ -20,8 +14,8 @@ public class EmployeeController {
     return result;
   }
 
-  public CloseableHttpResponse getSpecificEmployee(WebServiceDriver webServiceDriver, String iD) throws Exception{
-    CloseableHttpResponse result = webServiceDriver.getContent(String.format("/api/EmployeesAPI/PutEmployee/{0}", iD),
+  public CloseableHttpResponse getSpecificEmployee(WebServiceDriver webServiceDriver) throws Exception{
+    CloseableHttpResponse result = webServiceDriver.getContent("/api/EmployeesAPI/GetEmployee/7378",
         ContentType.APPLICATION_JSON,true);
 
     return result;
