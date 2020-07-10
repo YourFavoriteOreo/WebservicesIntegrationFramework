@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class Employee {
 
    @JsonProperty("EmployeeID")
-   public int employeeID;
+   public long employeeID;
 
    @JsonProperty("EmpFirstName")
    public String empFirstName;
@@ -17,41 +17,25 @@ public class Employee {
   public String empAddress;
 
    @JsonProperty("StateID")
-  public int stateID;
+  public long stateID;
 
    @JsonProperty("CityID")
-  public int cityID;
+  public long cityID;
 
   @JsonProperty("DepartmentID")
-  public int departmentID;
+  public long departmentID;
 
+  @JsonProperty("CityObj")
   public CityObj CityObj;
+
+  @JsonProperty("StateObj")
   public StateObj StateObj;
 
   @JsonProperty("DepartmentObj")
   public DepartmentObj DepartmentObj;
 
-    public class CityObj
-    {
-      public int cityID;
-      public String cityName;
-    }
-
-    public class StateObj
-    {
-      public int stateID;
-      public String stateName;
-      public String stateAbbreviation;
-    }
-
-    public class DepartmentObj
-    {
-      public int departmentID;
-      public String departmentName;
-    }
-
-    public Employee(int employeeID, String empFirstName, String empLastName, String empAddress,
-        int stateID, int cityID, int departmentID, CityObj cityObj, StateObj stateObj, DepartmentObj departmentObj) {
+    public Employee(long employeeID, String empFirstName, String empLastName, String empAddress,
+        long stateID, long cityID, long departmentID, CityObj cityObj, StateObj stateObj, DepartmentObj departmentObj) {
       this.employeeID = employeeID;
       this.empFirstName = empFirstName;
       this.empLastName = empLastName;
