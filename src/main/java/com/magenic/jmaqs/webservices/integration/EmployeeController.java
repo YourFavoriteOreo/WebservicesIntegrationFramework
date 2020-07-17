@@ -14,14 +14,14 @@ public class EmployeeController {
     return result;
   }
 
-  public CloseableHttpResponse getSpecificEmployee(WebServiceDriver webServiceDriver) throws Exception{
-    CloseableHttpResponse result = webServiceDriver.getContent("/api/EmployeesAPI/GetEmployee/11800",
+  public CloseableHttpResponse getSpecificEmployee(WebServiceDriver webServiceDriver, int iD) throws Exception{
+    CloseableHttpResponse result = webServiceDriver.getContent(String.format("/api/EmployeesAPI/GetEmployee/{0}", iD),
         ContentType.APPLICATION_JSON,true);
-
+//11800
     return result;
   }
 
-  public CloseableHttpResponse updateSpecificEmployee(WebServiceDriver webServiceDriver, HttpEntity content, String iD) throws Exception{
+  public CloseableHttpResponse updateSpecificEmployee(WebServiceDriver webServiceDriver, HttpEntity content, int iD) throws Exception{
     CloseableHttpResponse result = webServiceDriver.putContent(String.format("/api/EmployeesAPI/PutEmployee/{0}", iD), content,
         ContentType.APPLICATION_JSON, true);
 
@@ -35,7 +35,7 @@ public class EmployeeController {
     return result;
   }
 
-  public CloseableHttpResponse removeEmployee(WebServiceDriver webServiceDriver, String iD) throws Exception{
+  public CloseableHttpResponse removeEmployee(WebServiceDriver webServiceDriver, int iD) throws Exception{
     CloseableHttpResponse result = webServiceDriver.deleteContent(String.format("/api/EmployeesAPI/DeleteEmployee/{0}", iD),
         ContentType.APPLICATION_JSON, false);
 

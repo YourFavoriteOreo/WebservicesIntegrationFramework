@@ -9,8 +9,10 @@ import com.magenic.jmaqs.webservices.jdk8.WebServiceUtilities;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.testng.asserts.SoftAssert;
@@ -46,13 +48,16 @@ public class EmployeeTest extends BaseWebServiceTest {
    */
   @Test
   public void testGetSpecificEmployee() throws Exception {
+    // Verify the employee grabbed exists
     EmployeeController controller = new EmployeeController();
     SoftAssert softAssert = new SoftAssert();
-    CloseableHttpResponse result = controller.getSpecificEmployee(this.getWebServiceDriver());
+    CloseableHttpResponse result = controller.getSpecificEmployee(this.getWebServiceDriver(), 11800);
     softAssert.assertEquals(HttpStatus.SC_OK, result.getStatusLine().getStatusCode());
 
+    // Break down the grabbed response into an employeeJson
     Employee empJson = WebServiceUtilities.deserializeJson(result, Employee.class);
 
+    // Verify the json was made into an employee object properly
     Assert.assertNotNull(empJson, "Could not deserialize object from json properly");
   }
   /*
@@ -60,12 +65,16 @@ public class EmployeeTest extends BaseWebServiceTest {
    */
   @Test
   public void testAddEmployee() throws Exception{
+    // Initialize variables
     EmployeeController controller = new EmployeeController();
     SoftAssert softAssert = new SoftAssert();
     Employee newEmp = createNewEmployee();
 
-    HttpEntity content = WebServiceUtilities.serializeJson(newEmp);
-    CloseableHttpResponse result = controller.addEmployee(this.getWebServiceDriver(), newEmp);
+    // Make the employee into HttpContent to pass to endpoint
+    HttpEntity content = (HttpEntity) newEmp;
+    CloseableHttpResponse result = controller.addEmployee(this.getWebServiceDriver(), content);
+
+    // Assert the employee was added
     softAssert.assertEquals(HttpStatus.SC_OK, result.getStatusLine().getStatusCode());
   }
 
@@ -74,7 +83,28 @@ public class EmployeeTest extends BaseWebServiceTest {
    */
   @Test
   public void testUpdateEmployeeInfo() throws Exception{
+    // Grab an employee that already exists
+    EmployeeController controller = new EmployeeController();
+    SoftAssert softAssert = new SoftAssert();
+    CloseableHttpResponse result = controller.getSpecificEmployee(this.getWebServiceDriver(), 654321);
+    softAssert.assertEquals(HttpStatus.SC_OK, result.getStatusLine().getStatusCode());
 
+    // Update the grabbed employee
+    Employee empJson = WebServiceUtilities.deserializeJson(result, Employee.class);
+    String newLastName = "UpdateLastName";
+    empJson.empLastName = newLastName;
+
+    // Make the employee into HttpContent to pass to endpoint
+    HttpEntity content = (HttpEntity) empJson;
+    CloseableHttpResponse updateResult = controller.updateSpecificEmployee(this.getWebServiceDriver(), content, 654321);
+
+    // Verify the update was successful
+    softAssert.assertEquals(HttpStatus.SC_OK, updateResult.getStatusLine().getStatusCode());
+
+    // Get the newly updated employee info and verify it's a match
+    CloseableHttpResponse verify = controller.getSpecificEmployee(this.getWebServiceDriver(), 654321);
+    Employee updateJson = WebServiceUtilities.deserializeJson(verify, Employee.class);
+    softAssert.assertEquals(updateJson.empLastName, newLastName);
   }
 
   /*
@@ -82,28 +112,50 @@ public class EmployeeTest extends BaseWebServiceTest {
    */
   @Test
   public void testRemoveEmployee() throws Exception{
+    // Attempt to remove the employee
+    EmployeeController controller = new EmployeeController();
+    SoftAssert softAssert = new SoftAssert();
+    CloseableHttpResponse result = controller.removeEmployee(this.getWebServiceDriver(), 654321);
 
+    // Check the removal was successful
+    softAssert.assertEquals(HttpStatus.SC_OK, result.getStatusLine().getStatusCode());
+
+    // Verify the employee is no longer in the database
+    CloseableHttpResponse verify = controller.getSpecificEmployee(this.getWebServiceDriver(), 654321);
+    softAssert.assertEquals(HttpStatus.SC_NOT_FOUND, verify.getStatusLine().getStatusCode());
   }
 
+  /*
+    Method to create a new employee
+ */
   public Employee createNewEmployee() throws Exception{
     // create new employee object
     Random randInt = new Random();
     Employee newEmp = new Employee();
 
-    newEmp.employeeID =  randInt.nextInt(99999);
+    StateObj stateObj = new StateObj();
+    stateObj.setStateID(1);
+    stateObj.setStateName("Minnesota");
+    stateObj.setStateAbbreviation("MN");
+
+    CityObj cityObj = new CityObj();
+    cityObj.setCityName("Rox Town");
+    cityObj.setCityID(12);
+
+    DepartmentObj depObj = new DepartmentObj();
+    depObj.setDepartmentID(7);
+    depObj.setDepartmentName("Quality Engineer");
+
+    newEmp.employeeID =  654321;
     newEmp.empFirstName = "Spider";
     newEmp.empLastName = "Man";
     newEmp.empAddress = "123 Magenic Rox Ln";
-    newEmp.StateObj.setStateID(1);
-    newEmp.StateObj.setStateName("Minnesota");
-    newEmp.StateObj.setStateAbbreviation("MN");
-    newEmp.CityObj.setCityName("Rox Town");
-    newEmp.CityObj.setCityID(12);
-    newEmp.DepartmentObj.setDepartmentID(7);
-    newEmp.DepartmentObj.setDepartmentName("Quality Engineer");
-    newEmp.stateID = newEmp.StateObj.getStateID();
-    newEmp.cityID = newEmp.CityObj.getCityID();
-    newEmp.departmentID= newEmp.DepartmentObj.getDepartmentID();
+    newEmp.StateObj = stateObj;
+    newEmp.CityObj = cityObj;
+    newEmp.DepartmentObj = depObj;
+    newEmp.stateID = stateObj.getStateID();
+    newEmp.cityID = cityObj.getCityID();
+    newEmp.departmentID= depObj.getDepartmentID();
 
     return newEmp;
   }
